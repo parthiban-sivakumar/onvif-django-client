@@ -1,10 +1,27 @@
 # onvif-python
 Onvif django app for viewing camera device information, system date time, and system logs.
 
+## Requirements
+
+- Python 3.10+
+- Django 5.2.5
+- Other dependencies: see `requirements.txt`
+
 ## Installation:
 
 `pip install django`  
 `pip install --upgrade onvif_zeep`
+
+## Initial Setup
+
+After cloning the repository and installing dependencies, set up the database:
+
+# Generate migration files
+python manage.py makemigrations
+
+# Apply migrations to create tables
+python manage.py migrate
+
 
 ## Update
 

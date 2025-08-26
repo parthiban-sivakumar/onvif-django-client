@@ -2,12 +2,16 @@ from django.shortcuts import render
 from django.views.generic.base import View
 from onvif import ONVIFCamera
 from django.shortcuts import redirect
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render
 import os
 from django.template import RequestContext
 from onvifApp.settings import BASE_DIR
 from camera.models import Camera
 from onvif import ONVIFService
+import onvif
+import json
+
+from django.http import JsonResponse
 # import zeep
 # from zeep.wsse.username import UsernameToken
 
@@ -17,11 +21,13 @@ class CameraView(View):
 
     def get(self, request, *args, **kwargs):
         
+        #Check WSDL path
+        WSDL_PATH = os.path.join(os.path.dirname(onvif.__file__), 'wsdl')
         # Get Hostname
         cam_obj = Camera.objects.get(id=kwargs['id'])
         mycam = None
         try:
-            mycam = ONVIFCamera(cam_obj.ip, cam_obj.port, cam_obj.username, cam_obj.password, '/usr/local/lib/python2.7/site-packages/wsdl/')
+            mycam = ONVIFCamera(cam_obj.ip, int(cam_obj.port), cam_obj.username, cam_obj.password)
         except Exception as e:
             print('Exception message : ' , str(e))
             cam_obj.delete()
@@ -90,7 +96,13 @@ class CameraLoginView(View):
         port = request.POST.get('port', '')
         username = request.POST.get('username', '')
         password = request.POST.get('password', '')
+        
+        # cameras_list = list(Camera.objects.all().values())
+        
+
+        # return JsonResponse(cameras_list,safe=False)        # Check if camera is valid
         obj = Camera.objects.create(ip=ip, port=port,
             username=username, password=password)
+
         return redirect(
 			'camera_detail', obj.id)
